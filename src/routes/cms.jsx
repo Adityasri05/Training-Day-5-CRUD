@@ -47,8 +47,12 @@ const CMS = () => {
 
     const callAPI = async () => {
         try {
+            const token = localStorage.getItem("token");
             const response = await fetch("/api/woods", {
                 method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
             });
 
             const result = await response.json(); // or response.text()
@@ -90,10 +94,12 @@ const CMS = () => {
                 available: true,
             };
 
+            const token = localStorage.getItem("token");
             const response = await fetch("/api/woods", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify(raw),
             });
@@ -120,10 +126,12 @@ const CMS = () => {
     const callDeleteAPI = async () => {
         try {
 
+            const token = localStorage.getItem("token");
             const response = await fetch("/api/woods/" + id, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
                 },
             });
 
@@ -152,10 +160,12 @@ const CMS = () => {
                 name: name,
                 description: description,
             };
+            const token = localStorage.getItem("token");
             const response = await fetch("/api/woods/" + idData?._id, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
                 },
                  body: JSON.stringify(raw),
             });
