@@ -79,6 +79,7 @@ const CMS = () => {
 
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
+    const [image, setImage] = useState("")
 
 
     const callPostAPI = async () => {
@@ -92,6 +93,7 @@ const CMS = () => {
                 pricePerUnit: 45.5,
                 description: description,
                 available: true,
+                image: image || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600",
             };
 
             const token = localStorage.getItem("token");
@@ -105,16 +107,19 @@ const CMS = () => {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error || `HTTP error! Status: ${response.status}`);
             }
 
             const result = await response.json();
 
             console.log(result);
+            setImage(""); // Reset image input
             handleClose();
             callAPI()
         } catch (error) {
             console.error("Error:", error);
+            alert(error.message);
         }
     };
     // ________________ POST API CALL ________________
@@ -136,7 +141,8 @@ const CMS = () => {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error || `HTTP error! Status: ${response.status}`);
             }
 
             const result = await response.json();
@@ -146,6 +152,7 @@ const CMS = () => {
             callAPI()
         } catch (error) {
             console.error("Error:", error);
+            alert(error.message);
         }
     };
     // ________________ DELETE API CALL ________________
@@ -157,8 +164,9 @@ const CMS = () => {
     const callEditAPI = async () => {
         try {
              const raw = {
-                name: name,
-                description: description,
+                name: name || idData?.name,
+                description: description || idData?.description,
+                image: image || idData?.image,
             };
             const token = localStorage.getItem("token");
             const response = await fetch("/api/woods/" + idData?._id, {
@@ -170,7 +178,8 @@ const CMS = () => {
                  body: JSON.stringify(raw),
             });
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error || `HTTP error! Status: ${response.status}`);
             }
             const result = await response.json();
             handleCloseEdit();
@@ -254,7 +263,9 @@ const CMS = () => {
                     <hr />
                     <label>Description</label>
                     <input type="text" onChange={(e) => setDescription(e.target.value)} placeholder="e.g. Prized hardwood, weather-resistant" />
-
+                    <hr />
+                    <label>Image URL</label>
+                    <input type="text" onChange={(e) => setImage(e.target.value)} placeholder="e.g. https://images.unsplash.com/... (optional)" />
                 </Modal.Body>
                 <Modal.Footer>
                     <button className="hero-btn secondary" style={{ padding: "8px 16px", fontSize: "14px" }} onClick={handleClose}>
@@ -301,6 +312,9 @@ const CMS = () => {
                     <hr />
                     <label>Description</label>
                     <input type="text" defaultValue={idData?.description} onChange={(e) => setDescription(e.target.value)} placeholder="e.g. Weather-resistant hardwood" />
+                    <hr />
+                    <label>Image URL</label>
+                    <input type="text" defaultValue={idData?.image} onChange={(e) => setImage(e.target.value)} placeholder="e.g. https://images.unsplash.com/..." />
                 </Modal.Body>
                 <Modal.Footer>
                     <button className="hero-btn secondary" style={{ padding: "8px 16px", fontSize: "14px" }} onClick={handleCloseEdit}>
