@@ -18,7 +18,7 @@ export default function handler(req, res) {
 
   // Get the path and query parameters from the request URL
   const path = req.url.replace(/^\/api/, '');
-  const targetUrlStr = `https://mywoods-api.onrender.com/api${path}`;
+  const targetUrlStr = `https://training-day-8-mywood-deployment.onrender.com/api${path}`;
   const parsedUrl = new URL(targetUrlStr);
 
   const headers = {

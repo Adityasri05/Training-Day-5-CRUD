@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://mywoods-api.onrender.com',
+        target: 'https://training-day-8-mywood-deployment.onrender.com',
         changeOrigin: true,
         secure: false,
       },
