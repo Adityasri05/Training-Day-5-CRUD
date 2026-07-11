@@ -1,9 +1,43 @@
+import { useEffect, useState } from "react";
 import CardData from "../sampleData/cardData";
 import Card from "../components/molecule/card";
 
+const defaultImages = [
+  "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600",
+  "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=600",
+  "https://images.unsplash.com/photo-1448375240586-882707db888b?w=600",
+  "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=600",
+];
+
 const Home = () => {
-    // Select the first 3 cards as featured items for the Home page
-    const featuredItems = CardData.slice(0, 3);
+    // Select the first 3 cards as featured items for the Home page (fallback)
+    const [featuredItems, setFeaturedItems] = useState(CardData.slice(0, 3));
+
+    useEffect(() => {
+        const fetchFeatured = async () => {
+            try {
+                const response = await fetch("/api/woods");
+                if (response.ok) {
+                    const data = await response.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        const formatted = data.slice(0, 3).map((item, index) => ({
+                            id: item._id || item.id || index,
+                            title: item.name,
+                            category: item.type || "Hardwood",
+                            description: item.description,
+                            price: item.pricePerUnit ? `₹${item.pricePerUnit}` : "₹45.5",
+                            image: item.image || defaultImages[index % defaultImages.length]
+                        }));
+                        setFeaturedItems(formatted);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to fetch featured woods, using fallback:", err);
+            }
+        };
+
+        fetchFeatured();
+    }, []);
 
     return (
         <>
