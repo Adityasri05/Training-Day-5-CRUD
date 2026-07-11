@@ -16,7 +16,12 @@ const Home = () => {
     useEffect(() => {
         const fetchFeatured = async () => {
             try {
-                const response = await fetch("/api/woods");
+                const token = localStorage.getItem("token");
+                const headers = {};
+                if (token) {
+                    headers["Authorization"] = `Bearer ${token}`;
+                }
+                const response = await fetch("/api/woods", { headers });
                 if (response.ok) {
                     const data = await response.json();
                     if (Array.isArray(data) && data.length > 0) {

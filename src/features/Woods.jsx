@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Card from "../components/molecule/card";
+import CardData from "../sampleData/cardData";
 
 // Fallback high-quality wood images if the database item does not specify an image
 const defaultImages = [
@@ -12,20 +13,25 @@ const defaultImages = [
 const WoodsPage = () => {
     const [woods, setWoods] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchWoods = async () => {
             try {
-                const response = await fetch("/api/woods");
+                const token = localStorage.getItem("token");
+                const headers = {};
+                if (token) {
+                    headers["Authorization"] = `Bearer ${token}`;
+                }
+
+                const response = await fetch("/api/woods", { headers });
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 const data = await response.json();
                 setWoods(data);
             } catch (err) {
-                console.error("Failed to fetch woods:", err);
-                setError(err.message);
+                console.warn("Failed to fetch woods from API, falling back to static specimen data:", err);
+                setWoods(CardData);
             } finally {
                 setLoading(false);
             }
@@ -44,16 +50,6 @@ const WoodsPage = () => {
         );
     }
 
-    if (error) {
-        return (
-            <div className="woods-page" style={{ textAlign: "center", padding: "100px 20px" }}>
-                <div style={{ color: "#ef4444", fontSize: "1.1rem" }}>
-                    Failed to load wood species: {error}
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="woods-page">
             <div className="cardsClass">
@@ -61,10 +57,10 @@ const WoodsPage = () => {
                     woods.map((item, index) => {
                         const mappedItem = {
                             id: item._id || item.id || index,
-                            title: item.name,
-                            category: item.type || "Hardwood",
+                            title: item.name || item.title,
+                            category: item.type || item.category || "Hardwood",
                             description: item.description,
-                            price: item.pricePerUnit ? `₹${item.pricePerUnit}` : "₹45.5",
+                            price: item.pricePerUnit ? `₹${item.pricePerUnit}` : (item.price || "₹45.5"),
                             image: item.image || defaultImages[index % defaultImages.length],
                         };
                         return <Card key={mappedItem.id} item={mappedItem} />;
